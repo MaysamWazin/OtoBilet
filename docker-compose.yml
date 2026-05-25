@@ -1,0 +1,48 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: mysql:8.0
+    container_name: otobilet_mysql
+    restart: always
+    command: --event-scheduler=ON
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_DATABASE: otobilet_db
+      MYSQL_USER: otobilet_user
+      MYSQL_PASSWORD: otobilet_pass
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./backend/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "3306:3306"
+
+  backend:
+    build:
+      context: ./backend
+    container_name: otobilet_php
+    volumes:
+      - ./backend/src:/var/www/html
+    depends_on:
+      - db
+    environment:
+      DB_HOST: db
+      DB_NAME: otobilet_db
+      DB_USER: otobilet_user
+      DB_PASS: otobilet_pass
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: otobilet_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./frontend/public:/var/www/html/public
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+
+volumes:
+  db_data:

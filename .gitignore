@@ -1,0 +1,10 @@
+/backend/database/bilet_sistemi.sqlite
+/backend/database/bilet_sistemi_TEST.sqlite
+
+
+.vscode/
+.idea/
+
+
+.DS_Store
+Thumbs.db
