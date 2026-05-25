@@ -1,12 +1,6 @@
--- ============================================================
--- OTOBİLET - MySQL Veritabanı
--- ============================================================
 
 USE otobilet_db;
 
--- ----------------------------
--- TABLOLAR
--- ----------------------------
 
 CREATE TABLE IF NOT EXISTS Bus_Company (
     id VARCHAR(64) PRIMARY KEY,
@@ -168,9 +162,7 @@ BEGIN
     SELECT * FROM Bus_Company WHERE id=p_id LIMIT 1;
 END$$
 
--- ----------------------------
 -- STORED PROCEDURES - TRIPS
--- ----------------------------
 
 CREATE PROCEDURE sp_trip_ekle(
     IN p_id VARCHAR(64), IN p_company_id VARCHAR(64),
@@ -226,9 +218,7 @@ BEGIN
     SELECT * FROM Trips WHERE company_id=p_company_id ORDER BY departure_time DESC;
 END$$
 
--- ----------------------------
 -- STORED PROCEDURES - COUPONS
--- ----------------------------
 
 CREATE PROCEDURE sp_coupon_ekle(
     IN p_id VARCHAR(64), IN p_code VARCHAR(50), IN p_discount DECIMAL(5,2),
@@ -271,9 +261,9 @@ BEGIN
     UPDATE Coupons SET usage_limit = usage_limit - 1 WHERE id = p_id;
 END$$
 
--- ----------------------------
+
 -- STORED PROCEDURES - TICKETS
--- ----------------------------
+
 
 CREATE PROCEDURE sp_ticket_ekle(
     IN p_id VARCHAR(64), IN p_trip_id VARCHAR(64),
@@ -314,9 +304,9 @@ BEGIN
     WHERE tk.id = p_id LIMIT 1;
 END$$
 
--- ----------------------------
+
 -- STORED PROCEDURES - BOOKED_SEATS
--- ----------------------------
+
 
 CREATE PROCEDURE sp_seat_ekle(
     IN p_id VARCHAR(64), IN p_ticket_id VARCHAR(64), IN p_seat_number INT
@@ -338,9 +328,9 @@ BEGIN
     WHERE t.trip_id = p_trip_id AND t.status = 'active';
 END$$
 
--- ----------------------------
+
 -- FUNCTION 1: İndirimli toplam fiyat hesapla
--- ----------------------------
+
 
 CREATE FUNCTION fn_indirimli_fiyat(p_fiyat DECIMAL(10,2), p_indirim DECIMAL(5,2))
 RETURNS DECIMAL(10,2)
@@ -349,9 +339,8 @@ BEGIN
     RETURN p_fiyat - (p_fiyat * p_indirim / 100);
 END$$
 
--- ----------------------------
+
 -- FUNCTION 2: Seferdeki dolu koltuk sayısı
--- ----------------------------
 
 CREATE FUNCTION fn_dolu_koltuk_sayisi(p_trip_id VARCHAR(64))
 RETURNS INT
@@ -365,9 +354,8 @@ BEGIN
     RETURN v_sayi;
 END$$
 
--- ----------------------------
+
 -- TRIGGER 1: Bilet iptalinde koltukları serbest bırak
--- ----------------------------
 
 CREATE TRIGGER trg_ticket_iptal_seat_sil
 AFTER UPDATE ON Tickets
@@ -378,14 +366,14 @@ BEGIN
     END IF;
 END$$
 
--- ----------------------------
+
 -- TRIGGER 2: Kupon kullanılınca limiti düşür
--- ----------------------------
+
 DELIMITER ;
 -- YENİ EKLENECEK KISIM --
--- ----------------------------
+
 -- EVENT 1: Süresi geçmiş biletleri otomatik iptal et (Her Saat Başı)
--- ----------------------------
+
 CREATE EVENT IF NOT EXISTS ev_biletleri_gecersiz_yap
 ON SCHEDULE EVERY 1 HOUR
 DO
@@ -395,9 +383,9 @@ DO
     AND trip_id IN (SELECT id FROM Trips WHERE departure_time < NOW());
 
 
--- ----------------------------
+
 -- TEST VERİLERİ
--- ----------------------------
+
 
 INSERT IGNORE INTO Bus_Company(id, name) VALUES
 ('company_metro', 'Metro Turizm'),
